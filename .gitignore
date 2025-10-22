@@ -1,0 +1,15 @@
+.venv/
+.idea/
+__pycache__/
+*.pyc
+.DS_Store
+
+data/raw/
+data/interim/
+data/processed/
+models/
+experiments/
+reports/figs/
+reports/metrics/
+wandb/
+mlruns/

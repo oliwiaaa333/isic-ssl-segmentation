@@ -1,0 +1,7 @@
+resize: [256, 256]
+normalize: true
+hair_removal:
+  enabled: false
+artifacts:
+  save_examples: 0
+
