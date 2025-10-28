@@ -1,7 +1,10 @@
+input_csv: data/metadata/isic2018_task1_train_small.csv  # manifest z danymi do przetworzenia
+output_dir: data/processed
 resize: [256, 256]
 normalize: true
+save_format: png
 hair_removal:
-  enabled: false
+  enabled: true
 artifacts:
-  save_examples: 0
+  save_examples: 3
 
