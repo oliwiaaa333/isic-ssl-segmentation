@@ -1,0 +1,6 @@
+filename,image_url,mask_url
+ISIC_0000479,data/processed_test_hair_removal/images/ISIC_0000479.png,data/processed_test_hair_removal/masks/ISIC_0000479_segmentation.png
+ISIC_0009800,data/processed_test_hair_removal/images/ISIC_0009800.png,data/processed_test_hair_removal/masks/ISIC_0009800_segmentation.png
+ISIC_0012228,data/processed_test_hair_removal/images/ISIC_0012228.png,data/processed_test_hair_removal/masks/ISIC_0012228_segmentation.png
+ISIC_0012810,data/processed_test_hair_removal/images/ISIC_0012810.png,data/processed_test_hair_removal/masks/ISIC_0012810_segmentation.png
+ISIC_0014162,data/processed_test_hair_removal/images/ISIC_0014162.png,data/processed_test_hair_removal/masks/ISIC_0014162_segmentation.png
