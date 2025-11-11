@@ -7,7 +7,8 @@ __pycache__/
 data/raw/
 data/interim/
 data/processed/
-models/
+/models/
+!src/models/
 experiments/
 reports/figs/
 reports/metrics/
