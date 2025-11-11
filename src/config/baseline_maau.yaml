@@ -1,6 +1,58 @@
-model: maau
-batch_size: 8
-max_epochs: 5
-lr: 3e-4
-val_split: 0.2
-seed: 0
+experiment:
+  name: maau_baseline_isic2018
+  seed: 0
+  output_dir: experiments/
+
+data:
+  train_csv:
+  val_csv:
+  image_key:
+  mask_key:
+  image_size:
+  num_workers: 4
+  augmentations: maau
+
+model:
+  type: maau
+  in_channels: 3
+  out_channels: 1
+  encoder_filters: [64, 128, 256, 512]
+  decoder_filters: [512, 256, 128, 64]
+  use_attention_gates: true
+  use_antialiasing_pool: true
+  final_activation: sigmoid
+
+training:
+  batch_size: 8
+  epochs: 5
+  device: cuda
+  mixed_precision: true
+  early_stopping_patience: 10
+
+loss:
+  type: dice_bce
+  dice_weight: 0.5
+  bce_weight: 0.5
+
+optimizer:
+  type: adam
+  lr: 1.0e-4
+  weight_decay: 0.0
+
+scheduler:
+  type: cosine_annealing
+  t_max: 100
+  min_lr: 1.0e-6
+
+metrics:
+  - dice
+  - iou
+  - precision
+  - recall
+  - specificity
+
+logging:
+  save_every_epochs: 5
+  best_model_metric: dice
+  results_dir: reports/metrics/maau_baseline/
+  save_debug_predictions: true
