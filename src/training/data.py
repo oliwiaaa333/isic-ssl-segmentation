@@ -19,7 +19,7 @@ class SegDataset(Dataset):
             raise FileNotFoundError(f"Bad path: {row['image_url']} / {row['mask_url']}")
         out = self.transform(image=img, mask=mask) if self.transform else {"image": img, "mask": mask}
         x = out["image"]
-        y = out["mask"].unsqueeze(0).float()
+        y = (out["mask"].float() / 255.0).unsqueeze(0)
         return x, y
 
 
