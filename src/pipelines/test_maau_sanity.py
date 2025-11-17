@@ -16,17 +16,20 @@ def sanity_check():
     loader = DataLoader(dataset, batch_size=2, shuffle=False)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Device: {device}")
     # inicjalizacja modelu
     model = MAAU(in_channels=3, out_channels=1, final_activation="sigmoid").to(device)
     model.eval()  # tryb ewaluacji (bez dropout, BN w trybie eval)
 
     # próbny batch
     for images, masks in loader:
+        images = images.to(device)
+        masks = masks.to(device)
         print(f"[INFO] Wejście: {images.shape} | Maski: {masks.shape}")
         with torch.no_grad():
             preds = model(images)
         print(f"[INFO] Wyjście modelu: {preds.shape} | min={preds.min():.3f}, max={preds.max():.3f}")
-        break  # wystarczy 1 batch
+        break
 
 
 if __name__ == "__main__":

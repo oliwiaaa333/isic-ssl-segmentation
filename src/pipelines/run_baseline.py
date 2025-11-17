@@ -4,6 +4,8 @@ from pathlib import Path
 from datetime import datetime
 import shutil
 
+from src.training.train_maau import fit
+
 
 def prepare_experiment_dir(cfg):
     experiment_root = Path(cfg["experiment"]["output_dir"])
@@ -27,9 +29,12 @@ def prepare_experiment_dir(cfg):
     return experiment_dir
 
 def train(cfg, experiment_dir):
-    print("Training baseline with config:", cfg)
+    print("Training baseline MAAU\n")
+    print("Config:", cfg["_config_path"])
     print(f"Wyniki i logi będą zapisane w: {experiment_dir}")
-    # TODO: dataloaders z data/processed, model MAAU, pętla trenowania itd.
+    best_model_path = fit(cfg, experiment_dir)
+    print(f"[INFO] Trening zakonczony.")
+    print(f"[INFO] Najlepszy model zapisany w {best_model_path}")
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
@@ -41,4 +46,4 @@ if __name__ == "__main__":
 
     experiment_dir = prepare_experiment_dir(cfg)
 
-    train(cfg)
+    train(cfg, experiment_dir)
