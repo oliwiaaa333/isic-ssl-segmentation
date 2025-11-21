@@ -14,14 +14,14 @@ from albumentations.pytorch import ToTensorV2
 @torch.no_grad()
 def evaluate(model, loader, device, thr=0.5, loss_fn=None):
     model.eval()
-    total_loss = 0.0, 0
+    total_loss = 0.0
     dices, ious, precs, recs, specs = [], [], [], [], []
     for x, y in loader:
-        x, y = x.to(device, non_blocking=True), y.to(device, non_blocking=True)
+        x, y = x.to(device), y.to(device)
         pred = model(x)
 
         if loss_fn is not None:
-            total_loss += loss_fn(pred,y).item()* x.sizze(0)
+            total_loss += loss_fn(pred, y).item() * x.size(0)
 
         dices.append(dice_coeff(pred, y, thr))
         ious.append(iou_score(pred, y, thr))
@@ -66,7 +66,7 @@ def fit(cfg, experiment_dir: Path):
     device = torch.device(cfg["training"]["device"])
 
     train_tf = get_augmentations_maau()
-    val_tf = A.Compose([A.Normalize(mean=(0.485,0.456,0.406), std=(0.229,0.224,0.225)), ToTensorV2()])
+    val_tf = A.Compose([A.Resize(256,256),A.Normalize(mean=(0.485,0.456,0.406), std=(0.229,0.224,0.225)), ToTensorV2()])
 
     train_dl, val_dl = make_loaders(
         cfg["data"]["train_csv"],

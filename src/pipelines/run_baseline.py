@@ -28,6 +28,7 @@ def prepare_experiment_dir(cfg):
     print(f"[INFO] Utworzono katalog eksperymentu: {experiment_dir}")
     return experiment_dir
 
+
 def train(cfg, experiment_dir):
     print("Training baseline MAAU\n")
     print("Config:", cfg["_config_path"])
@@ -35,6 +36,7 @@ def train(cfg, experiment_dir):
     best_model_path = fit(cfg, experiment_dir)
     print(f"[INFO] Trening zakonczony.")
     print(f"[INFO] Najlepszy model zapisany w {best_model_path}")
+
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()

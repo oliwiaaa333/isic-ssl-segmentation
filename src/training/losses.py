@@ -12,5 +12,7 @@ def bce_loss(pred, target):
     return nn.BCELoss()(pred, target)
 
 
-def combined_loss(pred, target, alpha=0.5):
-    return alpha * dice_loss(pred, target) + (1 - alpha) * bce_loss(pred, target)
+def combined_loss(alpha=0.5, beta=0.5):
+    def _loss(pred,target):
+        return alpha * dice_loss(pred, target) + beta * bce_loss(pred, target)
+    return _loss

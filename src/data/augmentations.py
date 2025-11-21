@@ -4,6 +4,7 @@ from albumentations.pytorch import ToTensorV2
 def get_augmentations_maau():
     # augemntacje na podstawie publikacji PMID: 37189563
     return A.Compose([
+        A.Resize(256,256),
         A.HorizontalFlip(p=0.5),
         A.VerticalFlip(p=0.5),
         A.Affine(scale=(0.9, 1.1), translate_percent={"x": (-0.05, 0.05), "y": (-0.05, 0.05)}, shear=(-10,10), fit_output=False, p=0.5),

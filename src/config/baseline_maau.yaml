@@ -1,14 +1,15 @@
 experiment:
-  name: maau_baseline_isic2018
+  name: maau_baseline_p10
   seed: 0
   output_dir: experiments/
 
 data:
-  train_csv:
-  val_csv:
-  image_key:
-  mask_key:
-  image_size:
+  train_csv: data/metadata/isic2018_task1_train_labeled_p10.csv
+  val_csv: data/metadata/isic2018_task1_val.csv
+  test_csv: data/metadata/isic2018_task1_test.csv
+  image_key: image_url
+  mask_key: mask_url
+  image_size: 256
   num_workers: 4
   augmentations: maau
 
@@ -24,10 +25,10 @@ model:
 
 training:
   batch_size: 8
-  epochs: 5
+  epochs: 50
   device: cuda
-  mixed_precision: true
-  early_stopping_patience: 10
+  mixed_precision: false
+  early_stopping_patience: 15
 
 loss:
   type: dice_bce
