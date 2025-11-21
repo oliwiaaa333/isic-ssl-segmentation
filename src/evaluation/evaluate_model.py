@@ -4,7 +4,7 @@ from pathlib import Path
 import argparse
 
 from src.models.maau import MAAU
-from src.training.data import make_loader_test
+from src.training.data import make_loader_eval
 from src.training.metrics import dice_coeff, iou_score, precision_score, recall_score, specificity_score
 
 import albumentations as A
@@ -27,7 +27,7 @@ def evaluate_model(cfg_path, checkpoint_path):
 
     test_csv = cfg["data"]["val_csv"]
 
-    test_dl = make_loader_test(test_csv, test_tf, num_workers=cfg["data"]["num_workers"])
+    test_dl = make_loader_eval(test_csv, test_tf, num_workers=cfg["data"]["num_workers"])
 
     model = MAAU(
         in_channels=cfg["model"]["in_channels"],

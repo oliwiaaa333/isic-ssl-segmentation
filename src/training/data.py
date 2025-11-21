@@ -29,3 +29,14 @@ def make_loaders(train_csv, val_csv, train_tf, val_tf, batch_size=8, num_workers
     train_dl = DataLoader(train_ds, batch_size=batch_size, shuffle=True,  num_workers=num_workers, pin_memory=True)
     val_dl   = DataLoader(val_ds,   batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True)
     return train_dl, val_dl
+
+def make_loader_eval(test_csv, test_tf, num_workers=2):
+    test_ds = SegDataset(test_csv, transform=test_tf)
+    test_dl = DataLoader(
+        test_ds,
+        batch_size=1,
+        shuffle=False,
+        num_workers=num_workers,
+        pin_memory=True
+    )
+    return test_dl
