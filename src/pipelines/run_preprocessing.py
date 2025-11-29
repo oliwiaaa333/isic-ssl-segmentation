@@ -1,6 +1,6 @@
 import argparse
 import yaml
-import csv
+import pandas as pd
 import numpy as np
 from pathlib import Path
 import sys
@@ -13,8 +13,12 @@ from preproc_utils.preprocessing import (
     normalize_image, save_image
 )
 
+OUT_META_DIR = Path("data/metadata")
+OUT_META_DIR.mkdir(parents=True, exist_ok=True)
+
+
 def main(cfg):
-    csv_path = Path(cfg["input_csv"])
+    df = pd.read_csv(cfg["input_csv"])
     out_dir = Path(cfg["output_dir"])
     resize_size = tuple(cfg.get("resize", [256, 256]))
     normalize = cfg.get("normalize", True)
@@ -22,34 +26,44 @@ def main(cfg):
     save_format = cfg.get("save_format", "png")
     max_examples = cfg.get("artifacts", {}).get("save_examples", 0)
 
-    with open(csv_path, newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        rows = list(reader)
+    records = []
 
-    for i, row in enumerate(rows[:5]):  # TODO: na razie tylko 5 obrazów jako placeholder
-        img_path = Path(row["image_url"])
-        mask_path = Path(row["mask_url"]) if row.get("mask_url") else None
+    for i, row in df.iterrows():
+        in_img_path = Path(row["image_path"])
+        in_mask_path = Path(row["mask_path"]) if isinstance(row.get("mask_path"), str) and row["mask_path"] else None
 
-        img = load_image(img_path)
+        img_pil = load_image(in_img_path)
 
         if do_hair_removal:
-            img = remove_hairs(img)
+            img_pil = remove_hairs(img_pil)
 
-        img = resize_image(img, resize_size)
-        img_arr = normalize_image(img) if normalize else np.asarray(img)
+        img_pil = resize_image(img_pil, resize_size)
+        img_np = normalize_image(img_pil) if normalize else np.asarray(img_pil)
 
-        save_path = out_dir / "images" / img_path.name
-        save_image(img_arr, save_path, fmt=save_format)
+        out_img_path = out_dir / "images" / in_img_path.name
+        save_image(img_np, out_img_path, fmt=save_format)
 
-        if mask_path:
-            mask = load_mask(mask_path)
-            mask = resize_image(mask, resize_size, is_mask=True)
-            mask_arr = normalize_image(mask)
-            save_mask_path = out_dir / "masks" / mask_path.name
-            save_image(mask_arr, save_mask_path, fmt=save_format)
+        out_mask_path = ""
+        if in_mask_path:
+            mask_pil = load_mask(in_mask_path)
+            mask_pil = resize_image(mask_pil, resize_size, is_mask=True)
+            mask_np = normalize_image(mask_pil)
+            out_mask_path = out_dir / "masks" / in_mask_path.name
+            save_image(mask_np, out_mask_path, fmt=save_format)
 
         if i < max_examples:
-            print(f"[INFO] Example {i} saved: {save_path.name}")
+            print(f"[INFO] Example {i} processed: {out_img_path.name}")
+
+        records.append({
+            "filename": row["filename"],
+            "image_path": out_img_path.as_posix(),
+            "mask_path": out_mask_path if in_mask_path else ""
+        })
+
+    out_csv = OUT_META_DIR / "isic2018_processed.csv"
+    pd.DataFrame(records).to_csv(out_csv, index=False)
+    print(f"[INFO] Preprocessing completed, saved manifest: {out_csv}")
+
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()

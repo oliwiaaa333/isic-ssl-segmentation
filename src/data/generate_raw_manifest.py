@@ -26,7 +26,7 @@ def main():
         })
 
     df = pd.DataFrame(records)
-    out_path = OUT_DIR / "isic2018_raw_train.csv"
+    out_path = OUT_DIR / "isic2018_raw.csv"
     df.to_csv(out_path, index=False)
     print(f"Saved raw manifest {out_path} ({len(df)} rows)")
 
