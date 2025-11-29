@@ -1,14 +1,14 @@
 experiment:
-  name: maau_baseline_p10
+  name: maau_baseline
   seed: 0
   output_dir: experiments/
 
 data:
-  train_csv: data/metadata/isic2018_task1_train_labeled_p10.csv
-  val_csv: data/metadata/isic2018_task1_val.csv
-  test_csv: data/metadata/isic2018_task1_test.csv
-  image_key: image_url
-  mask_key: mask_url
+  train_csv: data/metadata/train_labeled.csv
+  val_csv: data/metadata/val.csv
+  test_csv: data/metadata/test.csv
+  image_key: image_path
+  mask_key: mask_path
   image_size: 256
   num_workers: 4
   augmentations: maau
@@ -46,6 +46,9 @@ scheduler:
   min_lr: 1.0e-6
 
 metrics:
+  threshold: 0.5
+  eps: 1e-7
+  names:
   - dice
   - iou
   - precision
