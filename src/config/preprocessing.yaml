@@ -1,4 +1,4 @@
-input_csv: data/metadata/isic2018_raw_train.csv  # dane do przetworzenia
+input_csv: data/metadata/isic2018_raw.csv  # dane do przetworzenia
 output_dir: data/processed
 resize: [256, 256]
 normalize: true

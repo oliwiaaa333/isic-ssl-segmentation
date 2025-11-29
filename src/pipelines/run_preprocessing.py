@@ -40,7 +40,7 @@ def main(cfg):
         img_pil = resize_image(img_pil, resize_size)
         img_np = normalize_image(img_pil) if normalize else np.asarray(img_pil)
 
-        out_img_path = out_dir / "images" / in_img_path.name
+        out_img_path = (out_dir / "images" / in_img_path.stem).with_suffix(f".{save_format}")
         save_image(img_np, out_img_path, fmt=save_format)
 
         out_mask_path = ""
