@@ -1,19 +1,3 @@
-"""
-Generuje pliki CSV (manifesty) dla ISIC 2018 Task 1 na podstawie lokalnych folderów:
- - images/train, val, test
- - masks/train, val
-
-Każdy wiersz zawiera:
-- filename (bez rozszerzenia)
-- image_url (ścieżka względna do obrazu)
-- mask_url (ścieżka względna do maski lub pusta dla testu)
-
-Pliki wyjściowe zapisywane są do `data/metadata/`:
- - isic2018_task1_train.csv
- - isic2018_task1_val.csv
- - isic2018_task1_test.csv
-"""
-
 from pathlib import Path
 import csv
 
