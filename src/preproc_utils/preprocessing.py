@@ -1,13 +1,16 @@
 from pathlib import Path
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image
 import cv2
+
 
 def load_image(path: Path) -> Image.Image:
     return Image.open(path).convert("RGB")
 
+
 def load_mask(path: Path) -> Image.Image:
     return Image.open(path).convert("L")
+
 
 def remove_hairs(img: Image.Image) -> Image.Image:
     # na podstawie publikacji PMC10969337
@@ -29,13 +32,16 @@ def remove_hairs(img: Image.Image) -> Image.Image:
     inpainted_rgb = cv2.cvtColor(inpainted, cv2.COLOR_BGR2RGB)
     return Image.fromarray(inpainted_rgb)
 
+
 def resize_image(img: Image.Image, size: tuple[int, int], is_mask: bool = False) -> Image.Image:
     resample = Image.NEAREST if is_mask else Image.BILINEAR
     return img.resize(size, resample=resample)
 
+
 def normalize_image(img: Image.Image) -> np.ndarray:
     arr = np.asarray(img).astype(np.float32) / 255.0
     return arr
+
 
 def save_image(arr: np.ndarray, path: Path, fmt: str = "png"):
     path.parent.mkdir(parents=True, exist_ok=True)
