@@ -4,7 +4,7 @@ from pathlib import Path
 from datetime import datetime
 import shutil
 
-from src.training.train_maau import fit
+from src.training.train_baseline import fit
 
 
 def prepare_experiment_dir(cfg):
