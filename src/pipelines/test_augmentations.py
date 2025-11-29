@@ -1,13 +1,13 @@
 import cv2
 import matplotlib.pyplot as plt
-from src.data.augmentations import get_augmentations_maau
+from src.data.augmentations import get_augmentations_supervised
 import pandas as pd
 from pathlib import Path
 
 manifest_path = Path("data/metadata/isic2018_task1_train_processed_test_hair_removal_small.csv") #do uzupelnienia odpowiednia sciezka
 manifest = pd.read_csv(manifest_path)
 
-augment = get_augmentations_maau()
+augment = get_augmentations_supervised()
 
 for i in range(5):
     img_url = Path(manifest.iloc[i]['image_url'])

@@ -4,15 +4,15 @@ import cv2
 import pandas as pd
 from pathlib import Path
 from src.models.maau import MAAU
-from src.data.augmentations import get_augmentations_maau
-from src.training.data import SegDataset
+from src.data.augmentations import get_augmentations_supervised
+from src.training.data import LabeledSegDataset
 
 
 def sanity_check():
     csv_path = Path("data/metadata/isic2018_task1_train_processed_test_hair_removal_small.csv")
-    augment = get_augmentations_maau()
+    augment = get_augmentations_supervised()
 
-    dataset = SegDataset(csv_path, transform=augment)
+    dataset = LabeledSegDataset(csv_path, transform=augment)
     loader = DataLoader(dataset, batch_size=2, shuffle=False)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

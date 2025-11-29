@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 from albumentations.pytorch import ToTensorV2
 import albumentations as A
 
-from src.training.data import SegDataset
+from src.training.data import LabeledSegDataset
 from src.models.maau import MAAU
 from src.training.metrics import dice_coeff
 from src.training.losses import dice_loss, bce_loss, combined_loss
@@ -27,7 +27,7 @@ def overfit_one_batch():
         ToTensorV2(),
     ])
 
-    ds = SegDataset(csv_path, transform)
+    ds = LabeledSegDataset(csv_path, transform)
     dl = DataLoader(ds, batch_size=batch_size, shuffle=True)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
