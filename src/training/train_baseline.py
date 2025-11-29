@@ -12,7 +12,7 @@ from albumentations.pytorch import ToTensorV2
 
 
 @torch.no_grad()
-def evaluate(model, loader, device, thr=0.5, loss_fn=None):
+def evaluate(model, loader, device, thr, eps, loss_fn=None):
     model.eval()
     total_loss = 0.0
     dices, ious, precs, recs, specs = [], [], [], [], []
@@ -23,11 +23,11 @@ def evaluate(model, loader, device, thr=0.5, loss_fn=None):
         if loss_fn is not None:
             total_loss += loss_fn(pred, y).item() * x.size(0)
 
-        dices.append(dice_coeff(pred, y, thr))
-        ious.append(iou_score(pred, y, thr))
-        precs.append(precision_score(pred, y, thr))
-        recs.append(recall_score(pred, y, thr))
-        specs.append(specificity_score(pred, y, thr))
+        dices.append(dice_coeff(pred, y, thr=thr, eps=eps))
+        ious.append(iou_score(pred, y, thr=thr, eps=eps))
+        precs.append(precision_score(pred, y, thr=thr, eps=eps))
+        recs.append(recall_score(pred, y, thr=thr, eps=eps))
+        specs.append(specificity_score(pred, y, thr=thr, eps=eps))
 
         n = len(loader.dataset)
     return {
@@ -140,7 +140,8 @@ def fit(cfg, experiment_dir: Path):
 
         val_metrics = evaluate(
             model, val_dl, device,
-            thr=0.5,
+            thr=float(cfg["metrics"]["threshold"]),
+            eps=float(cfg["metrics"]["eps"]),
             loss_fn=loss_fn
         )
 
