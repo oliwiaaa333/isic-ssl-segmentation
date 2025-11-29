@@ -1,55 +1,35 @@
 from pathlib import Path
-import csv
+import pandas as pd
 
 # Lokalizacja danych
-RAW_DIR = Path("data/raw")
-IMG_DIR = RAW_DIR / "images"
-MASK_DIR = RAW_DIR / "masks"
+RAW_IMG_DIR = Path("data/raw/images/train")
+RAW_MASK_DIR = Path("data/raw/masks/train")
 OUT_DIR = Path("data/metadata")
 
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-def collect_files(images_path: Path, masks_path: Path | None = None):
-    image_files = sorted(images_path.glob("*.jpg"))
-    data = []
-
-    for img_path in image_files:
-        stem = img_path.stem  # np. ISIC_0000000
-        image_rel = img_path.as_posix()
-
-        mask_rel = ""
-        if masks_path:
-            candidates = list(masks_path.glob(f"{stem}*_segmentation.*"))
-            if candidates:
-                mask_rel = candidates[0].as_posix()
-
-        data.append({
-            "filename": stem,
-            "image_url": image_rel,
-            "mask_url": mask_rel
-        })
-
-    return data
-
-def write_csv(data: list[dict], out_path: Path):
-    with open(out_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=["filename", "image_url", "mask_url"])
-        writer.writeheader()
-        writer.writerows(data)
 
 def main():
-    sets = [
-        ("train", IMG_DIR / "train", MASK_DIR / "train"),
-        ("val", IMG_DIR / "val", MASK_DIR / "val"),
-        ("test", IMG_DIR / "test", None),  # brak masek
-    ]
+    image_files = sorted(RAW_IMG_DIR.glob("*.jpg"))
 
-    for name, img_p, mask_p in sets:
-        print(f"[INFO] Generating manifest for: {name}")
-        rows = collect_files(img_p, mask_p)
-        out_file = OUT_DIR / f"isic2018_task1_{name}.csv"
-        write_csv(rows, out_file)
-        print(f" -> Saved {len(rows)} rows to {out_file}")
+    records = []
+    for img_path in image_files:
+        stem = img_path.stem
+        mask_candidates = list(RAW_MASK_DIR.glob(f"{stem}*_segmentation.*"))
+
+        mask_path = mask_candidates[0] if mask_candidates else None
+
+        records.append({
+            "filename": stem,
+            "image_path": img_path.as_posix(),
+            "mask_path": mask_path.as_posix() if mask_path else ""
+        })
+
+    df = pd.DataFrame(records)
+    out_path = OUT_DIR / "isic2018_raw_train.csv"
+    df.to_csv(out_path, index=False)
+    print(f"Saved raw manifest {out_path} ({len(df)} rows)")
+
 
 if __name__ == "__main__":
     main()
