@@ -25,7 +25,7 @@ def evaluate_model(cfg_path, checkpoint_path):
         ToTensorV2()
     ])
 
-    test_csv = cfg["data"]["val_csv"]
+    test_csv = cfg["data"]["test_csv"]
 
     test_dl = make_loader_eval(test_csv, test_tf, num_workers=cfg["data"]["num_workers"])
 
@@ -39,16 +39,19 @@ def evaluate_model(cfg_path, checkpoint_path):
     model.load_state_dict(ckpt["state_dict"])
     model.eval()
 
+    thr = float(cfg["metrics"]["threshold"])
+    eps = float(cfg["metrics"]["eps"])
+
     dices, ious, precs, recs, specs = [], [], [], [], []
 
     for x, y in test_dl:
         x, y = x.to(device), y.to(device)
         pred = model(x)
-        dices.append(dice_coeff(pred, y))
-        ious.append(iou_score(pred, y))
-        precs.append(precision_score(pred, y))
-        recs.append(recall_score(pred, y))
-        specs.append(specificity_score(pred, y))
+        dices.append(dice_coeff(pred, y, thr=thr, eps=eps))
+        ious.append(iou_score(pred, y, thr=thr, eps=eps))
+        precs.append(precision_score(pred, y, thr=thr, eps=eps))
+        recs.append(recall_score(pred, y, thr=thr, eps=eps))
+        specs.append(specificity_score(pred, y, thr=thr, eps=eps))
 
     print("\n Metryki: ")
     print("Dice:", sum(dices)/len(dices))
