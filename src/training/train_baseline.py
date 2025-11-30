@@ -181,7 +181,7 @@ def fit(cfg, experiment_dir: Path):
 
         if wait >= patience:
             print(
-                f"[INFO] Early stopping at epoch {epoch} "
+                f"[INFO] Early stopping na epoce {epoch} "
                 f"(best dice={best_dice:.4f})"
             )
             break

@@ -62,7 +62,7 @@ def main(cfg):
 
     out_csv = OUT_META_DIR / "isic2018_processed.csv"
     pd.DataFrame(records).to_csv(out_csv, index=False)
-    print(f"[INFO] Preprocessing completed, saved manifest: {out_csv}")
+    print(f"[INFO] Preprocessing zakończony, zapisano manifest: {out_csv}")
 
 
 if __name__ == "__main__":

@@ -68,7 +68,7 @@ def main():
     for split, df_split in manifests.items():
         out_csv = OUTPUT_DIR / f"{split}.csv"
         df_split.to_csv(out_csv, index=False)
-        print(f"[INFO] Saved {split} → {out_csv} ({len(df_split)} rows)")
+        print(f"[INFO] Zapisano {split} → {out_csv} ({len(df_split)} wierszy)")
 
 
 if __name__ == "__main__":
