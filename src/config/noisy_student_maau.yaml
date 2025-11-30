@@ -1,0 +1,79 @@
+experiment:
+  name: noisy_student
+  seed: 0
+  output_dir: experiments/
+
+data:
+  supervised_train_csv: data/metadata/train_labeled.csv
+  supervised_val_csv: data/metadata/val.csv
+  test_csv: data/metadata/test.csv
+
+  unlabeled_csv: data/metadata/train_unlabeled.csv
+
+  pseudo_labels_root: data/pseudo_labels/
+
+  image_key: image_path
+  mask_key: mask_path
+  image_size: 256
+  num_workers: 4
+
+augmentations:
+  supervised: supervised
+  teacher: teacher
+  student: student
+
+semi_supervised:
+  teacher_checkpoint: experiments/maau_baseline_seed0_20251129_184026/checkpoints/best_model.pt
+  confidence_thr: 0.5
+  min_conf: 0.3    # 0.55 dalo 37/500 zdjec    0.35 dalo 114 zdjec 0.3 144
+  use_confidence_filter: true
+  student_dropout: 0.5
+
+model:
+  type: maau
+  in_channels: 3
+  out_channels: 1
+  encoder_filters: [ 64, 128, 256, 512 ]
+  decoder_filters: [ 512, 256, 128, 64 ]
+  use_attention_gates: true
+  use_antialiasing_pool: true
+  final_activation: null
+
+training:
+  device: cuda
+  batch_size: 8
+  epochs_student: 5      # z 50 na 5 dla testu
+  mixed_precision: false
+  early_stopping_patience: 3   # z 10 na 3 dla testu
+
+loss:
+  type: dice_bce_logits
+  dice_weight: 0.5
+  bce_weight: 0.5
+
+optimizer:
+  type: adam
+  lr: 1.0e-4
+  weight_decay: 0.0
+
+scheduler:
+  type: cosine_annealing
+  t_max: 100
+  min_lr: 1.0e-6
+
+metrics:
+  threshold: 0.5
+  eps: 1.0e-7
+  names:
+    - dice
+    - iou
+    - precision
+    - recall
+    - specificity
+
+logging:
+  save_every_epochs: 5
+  best_model_metric: dice
+  results_dir: reports/metrics/noisy_student/
+  save_debug_predictions: true
+
