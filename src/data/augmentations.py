@@ -6,9 +6,9 @@ def get_augmentations(mode: str):
     if mode == "supervised":
         return get_augmentations_supervised()
     if mode == "teacher":
-        return get_augmentations_teacher_ns()
+        return get_augmentations_teacher()
     if mode == "student":
-        return get_augmentations_student_ns()
+        return get_augmentations_student()
     raise ValueError(f"Unknown augmentations mode: {mode}")
 
 
@@ -25,7 +25,8 @@ def get_augmentations_supervised():
     ])
 
 
-def get_augmentations_teacher_ns():
+# augmentacje dla noisy-student i dumm
+def get_augmentations_teacher():
     return A.Compose([
         A.Resize(256, 256),
         A.HorizontalFlip(p=0.5),
@@ -47,7 +48,7 @@ def get_augmentations_teacher_ns():
     ])
 
 
-def get_augmentations_student_ns():
+def get_augmentations_student():
     return A.Compose([
         A.Resize(256, 256),
         A.HorizontalFlip(p=0.5),
@@ -76,8 +77,3 @@ def get_augmentations_student_ns():
                     std=(0.229, 0.224, 0.225)),
         ToTensorV2(),
     ])
-
-
-def get_augmentations_dumm():
-    # TODO: dodac augmentacje
-    pass

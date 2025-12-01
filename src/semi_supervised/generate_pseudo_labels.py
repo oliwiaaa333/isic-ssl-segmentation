@@ -6,7 +6,7 @@ import cv2
 
 from src.models.maau import MAAU
 from src.training.data import make_loader_unlabeled
-from src.data.augmentations import get_augmentations_teacher_ns
+from src.data.augmentations import get_augmentations_teacher
 
 
 def save_mask(mask_tensor, save_path):
@@ -30,7 +30,7 @@ def generate_pseudo_labels(cfg):
     model.load_state_dict(ckpt["state_dict"])
     model.eval()
 
-    aug = get_augmentations_teacher_ns()
+    aug = get_augmentations_teacher()
     unlabeled_csv = cfg["data"]["unlabeled_csv"]
 
     unl_dl = make_loader_unlabeled(
