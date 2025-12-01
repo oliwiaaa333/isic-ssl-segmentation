@@ -5,7 +5,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader, random_split
 
 
-# dla nadzorowanego i czesci labeled w noisy student
+# dla nadzorowanego i czesci labeled w noisy student i dumm
 class LabeledSegDataset(Dataset):
     def __init__(self, csv_path, transform, return_path=False):
         self.df = pd.read_csv(csv_path)
@@ -30,7 +30,7 @@ class LabeledSegDataset(Dataset):
             return x, y
 
 
-# dla noisy student
+# dla noisy student i dumm
 class UnlabeledSegDataset(Dataset):
     def __init__(self, csv_path, transform):
         self.df = pd.read_csv(csv_path)
