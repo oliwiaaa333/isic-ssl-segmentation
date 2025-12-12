@@ -49,7 +49,9 @@ def evaluate_logits_full(model, loader, device, metric_fns, thr, eps):
     }
 
 
-def train_noisy_student(cfg, experiment_dir):
+def train_noisy_student(cfg, experiment_dir,
+                        pseudo_csv_name: str = "pseudo_labels_filtered.csv",
+                        init_checkpoint: str | None = None, tag: str = "r1"):
 
     device = torch.device(
         cfg["training"]["device"] if torch.cuda.is_available() else "cpu"
@@ -64,7 +66,7 @@ def train_noisy_student(cfg, experiment_dir):
     val_csv     = cfg["data"]["supervised_val_csv"]
 
     pseudo_root = Path(cfg["data"]["pseudo_labels_root"])
-    pseudo_csv = pseudo_root / "pseudo_labels_filtered.csv"
+    pseudo_csv = pseudo_root / pseudo_csv_name
 
     batch_size  = cfg["training"]["batch_size"]
     num_workers = cfg["data"]["num_workers"]
@@ -79,7 +81,12 @@ def train_noisy_student(cfg, experiment_dir):
         final_activation=None,
     ).to(device)
 
-    teacher_ckpt = torch.load(cfg["semi_supervised"]["teacher_checkpoint"], map_location=device)
+    if init_checkpoint is None:
+        ckpt_path = cfg["semi_supervised"]["teacher_checkpoint"]
+    else:
+        ckpt_path = init_checkpoint
+
+    teacher_ckpt = torch.load(ckpt_path, map_location=device)
     model.load_state_dict(teacher_ckpt["state_dict"])
 
     loss_fn = combined_loss_logits(
@@ -93,9 +100,14 @@ def train_noisy_student(cfg, experiment_dir):
         weight_decay=cfg["optimizer"]["weight_decay"],
     )
 
+    if tag == "r1":
+        T_max = cfg["scheduler"]["t_max"]
+    else:
+        T_max = cfg["scheduler"].get("t_max_star", cfg["scheduler"]["t_max"])
+
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(
         opt,
-        T_max=cfg["scheduler"]["t_max"],
+        T_max=T_max,
         eta_min=cfg["scheduler"]["min_lr"],
     )
 
@@ -114,7 +126,7 @@ def train_noisy_student(cfg, experiment_dir):
     ckpt_dir = exp_dir / "checkpoints"
     logs_dir = exp_dir / "logs"
 
-    csv_path = logs_dir / "metrics_student.csv"
+    csv_path = logs_dir / f"metrics_student_{tag}.csv"
     with open(csv_path, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([
@@ -132,10 +144,16 @@ def train_noisy_student(cfg, experiment_dir):
     best_val = -1
     patience = cfg["training"]["early_stopping_patience"]
 
-    best_path = ckpt_dir / "best_model.pt"
-    last_path = ckpt_dir / "last_model.pt"
+    best_round_path = ckpt_dir / f"best_model_{tag}.pt"
+    last_round_path = ckpt_dir / f"last_model_{tag}.pt"
+    best_model_path = ckpt_dir / "best_model.pt"
 
-    for epoch in range(1, cfg["training"]["epochs_student"] + 1):
+    if tag == "r1":
+        num_epochs = cfg["training"]["epochs_student"]
+    else:
+        num_epochs = cfg["training"].get("epochs_student_star", cfg["training"]["epochs_student"])
+
+    for epoch in range(1, num_epochs + 1):
 
         model.train()
         t0 = time.time()
@@ -182,14 +200,15 @@ def train_noisy_student(cfg, experiment_dir):
         if val_metrics["dice"] > best_val:
             best_val = val_metrics["dice"]
             patience = cfg["training"]["early_stopping_patience"]
-            torch.save({"state_dict": model.state_dict()}, best_path)
+            torch.save({"state_dict": model.state_dict()}, best_round_path)
+            torch.save({"state_dict": model.state_dict()}, best_model_path)
         else:
             patience -= 1
             if patience == 0:
                 print(f"[INFO] Early stopping na epoce {epoch} (best dice={best_val:.4f})")
                 break
 
-    torch.save({"state_dict": model.state_dict()}, last_path)
+    torch.save({"state_dict": model.state_dict()}, last_round_path)
     print("[INFO] Zapisano last model.")
 
-    return str(best_path)
+    return str(best_round_path)

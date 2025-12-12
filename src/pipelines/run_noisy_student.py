@@ -28,15 +28,41 @@ def prepare_experiment_dir(cfg):
     return experiment_dir
 
 
-def train(cfg, experiment_dir):
+def train_rounds(cfg, experiment_dir):
     print("Training Noisy Student\n")
     print("Config:", cfg["_config_path"])
     print(f"Wyniki i logi będą zapisane w: {experiment_dir}")
 
-    best_model_path = train_noisy_student(cfg, experiment_dir)
+    pseudo_root = Path(cfg["data"]["pseudo_labels_root"])
+    rounds = cfg["semi_supervised"]["rounds"]
 
-    print(f"[INFO] Trening zakonczony.")
-    print(f"[INFO] Najlepszy model zapisany w {best_model_path}")
+    print("[INFO] Runda 1: teacher -> student")
+
+    meta_csv_r1 = pseudo_root / "pseudo_labels.csv"
+    if meta_csv_r1.exists():
+        print("[INFO] Wykryto istniejący plik CSV. Pomijam generowanie pseudo-etykiet (runda 1)")
+    else:
+        generate_pseudo_labels(cfg, checkpoint_path=None, round_id=1)
+
+    filtered_r1 = filter_pseudo_labels(cfg, round_id=1)
+
+    print("[INFO] Trening studenta (runda1)")
+    best_student_r1 = train_noisy_student(cfg, experiment_dir, pseudo_csv_name=Path(filtered_r1).name, init_checkpoint=None, tag="r1")
+
+    if rounds == 1:
+        print("[INFO] Trening zakończono po 1 rundzie.")
+        print(f"[INFO] Najlepszy model studenta zapisany w: {best_student_r1}")
+        return
+
+    print("[INFO] Runda 2: student -> student*")
+    generate_pseudo_labels(cfg, checkpoint_path=best_student_r1, round_id=2)
+    filtered_r2 = filter_pseudo_labels(cfg, round_id=2)
+
+    print("[INFO] Trening studenta* (runda2)")
+    best_student_r2 = train_noisy_student(cfg, experiment_dir, pseudo_csv_name=Path(filtered_r2).name, init_checkpoint=best_student_r1, tag="r2")
+
+    print(f"[INFO] Trening zakończono po 2 rundzie.")
+    print(f"[INFO] Najlepszy model studenta* (runda 2) zapisany w {best_student_r2}")
 
 
 if __name__ == "__main__":
@@ -50,15 +76,4 @@ if __name__ == "__main__":
 
     experiment_dir = prepare_experiment_dir(cfg)
 
-    pseudo_root = Path(cfg["data"]["pseudo_labels_root"])
-    meta_csv = pseudo_root / "pseudo_labels.csv"
-    filtered_csv = pseudo_root / "pseudo_labels_filtered.csv"
-
-    if meta_csv.exists():
-        print("[INFO] Wykryto istniejący plik CSV. Pomijam generowanie pseudo-etykiet.")
-    else:
-        generate_pseudo_labels(cfg)
-
-    filter_pseudo_labels(cfg)
-
-    train(cfg, experiment_dir)
+    train_rounds(cfg, experiment_dir)

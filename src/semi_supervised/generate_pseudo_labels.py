@@ -17,7 +17,7 @@ def save_mask(mask_tensor, save_path):
     cv2.imwrite(str(save_path), mask_np)
 
 
-def generate_pseudo_labels(cfg):
+def generate_pseudo_labels(cfg, checkpoint_path=None, round_id: int =1):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     model = MAAU(
@@ -26,7 +26,12 @@ def generate_pseudo_labels(cfg):
         final_activation=None
     ).to(device)
 
-    ckpt = torch.load(cfg["semi_supervised"]["teacher_checkpoint"], map_location=device)
+    if checkpoint_path is None:
+        ckpt_path = cfg["semi_supervised"]["teacher_checkpoint"]
+    else:
+        ckpt_path = checkpoint_path
+
+    ckpt = torch.load(ckpt_path, map_location=device)
     model.load_state_dict(ckpt["state_dict"])
     model.eval()
 
@@ -41,14 +46,17 @@ def generate_pseudo_labels(cfg):
     )
 
     pseudo_root = Path(cfg["data"]["pseudo_labels_root"])
-    masks_dir = pseudo_root / "masks"
+    masks_dir = pseudo_root / f"masks_r{round_id}"
     masks_dir.mkdir(parents=True, exist_ok=True)
 
     meta_rows = []
 
     thr = cfg["semi_supervised"]["confidence_thr"]
 
-    print("[INFO] Generowanie pseudo-masek")
+    suffix = "" if round_id == 1 else f"_{round_id}"
+    meta_csv_path = pseudo_root / f"pseudo_labels{suffix}.csv"
+
+    print(f"[INFO] Generowanie pseudo-masek (runda {round_id}) z ckpt: {ckpt_path}")
     with torch.no_grad():
         for imgs, img_paths in tqdm(unl_dl):
             imgs = imgs.to(device)
@@ -59,7 +67,7 @@ def generate_pseudo_labels(cfg):
 
             for i in range(len(img_paths)):
                 img_path = img_paths[i]
-                filename = Path(img_path).stem + "_pseudo.png"
+                filename = Path(img_path).stem + f"_pseudo_r{round_id}.png"
                 save_path = masks_dir / filename
 
                 save_mask(binary[i], save_path)
@@ -71,7 +79,10 @@ def generate_pseudo_labels(cfg):
                 })
 
     df = pd.DataFrame(meta_rows)
-    df.to_csv(pseudo_root / "pseudo_labels.csv", index=False)
+    df.to_csv(meta_csv_path, index=False)
 
-    print(f"[INFO] Zapisanie pseudo-maski do:   {pseudo_root}")
+    print(f"[INFO] Zapisanie pseudo-masek do:   {pseudo_root}")
+    print(f"[INFO] Meta CSV (runda {round_id}): {meta_csv_path}")
     print(f"[INFO] Liczba wygenerowanych masek: {len(meta_rows)}")
+
+    return meta_csv_path
