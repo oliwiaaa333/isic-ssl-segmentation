@@ -32,7 +32,7 @@ def evaluate_model(cfg_path, checkpoint_path):
     model = MAAU(
         in_channels=cfg["model"]["in_channels"],
         out_channels=cfg["model"]["out_channels"],
-        final_activation=None,               # <<--- WAŻNE!
+        final_activation=None,
     ).to(device)
 
     ckpt = torch.load(checkpoint_path, map_location=device)
@@ -48,7 +48,7 @@ def evaluate_model(cfg_path, checkpoint_path):
         x, y = x.to(device), y.to(device)
 
         logits = model(x)
-        probs = torch.sigmoid(logits)        # <<--- KLUCZOWE !!!
+        probs = torch.sigmoid(logits)
 
         dices.append(dice_coeff(probs, y, thr=thr, eps=eps))
         ious.append(iou_score(probs, y, thr=thr, eps=eps))
