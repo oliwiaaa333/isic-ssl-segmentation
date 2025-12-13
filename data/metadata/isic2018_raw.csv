@@ -1,4 +1,4 @@
-filename,image_url,mask_url
+filename,image_path,mask_path
 ISIC_0000000,data/raw/images/train/ISIC_0000000.jpg,data/raw/masks/train/ISIC_0000000_segmentation.png
 ISIC_0000001,data/raw/images/train/ISIC_0000001.jpg,data/raw/masks/train/ISIC_0000001_segmentation.png
 ISIC_0000003,data/raw/images/train/ISIC_0000003.jpg,data/raw/masks/train/ISIC_0000003_segmentation.png
