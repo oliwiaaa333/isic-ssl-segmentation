@@ -2,11 +2,10 @@ import pandas as pd
 from pathlib import Path
 
 
-def filter_pseudo_labels(cfg, round_id: int=1):
-    pseudo_root = Path(cfg["data"]["pseudo_labels_root"])
-    suffix = "" if round_id == 1 else f"_{round_id}"
-    meta_path = pseudo_root / f"pseudo_labels{suffix}.csv"
-    out_path = pseudo_root / f"pseudo_labels{suffix}_filtered.csv"
+def filter_pseudo_labels(cfg, experiment_dir: Path, round_id: int=1):
+    pseudo_root = Path(experiment_dir) / "pseudo_labels"
+    meta_path = pseudo_root / f"pseudo_labels_r{round_id}.csv"
+    out_path = pseudo_root / f"pseudo_labels_r{round_id}_filtered.csv"
 
     min_conf = cfg["semi_supervised"]["min_conf"]
     use_filter = cfg["semi_supervised"]["use_confidence_filter"]

@@ -17,7 +17,7 @@ def save_mask(mask_tensor, save_path):
     cv2.imwrite(str(save_path), mask_np)
 
 
-def generate_pseudo_labels(cfg, checkpoint_path=None, round_id: int =1):
+def generate_pseudo_labels(cfg, experiment_dir: Path, checkpoint_path=None, round_id: int =1):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     model = MAAU(
@@ -45,7 +45,7 @@ def generate_pseudo_labels(cfg, checkpoint_path=None, round_id: int =1):
         num_workers=2
     )
 
-    pseudo_root = Path(cfg["data"]["pseudo_labels_root"])
+    pseudo_root = Path(experiment_dir) / "pseudo_labels"
     masks_dir = pseudo_root / f"masks_r{round_id}"
     masks_dir.mkdir(parents=True, exist_ok=True)
 
@@ -53,8 +53,7 @@ def generate_pseudo_labels(cfg, checkpoint_path=None, round_id: int =1):
 
     thr = cfg["semi_supervised"]["confidence_thr"]
 
-    suffix = "" if round_id == 1 else f"_{round_id}"
-    meta_csv_path = pseudo_root / f"pseudo_labels{suffix}.csv"
+    meta_csv_path = pseudo_root / f"pseudo_labels_r{round_id}.csv"
 
     print(f"[INFO] Generowanie pseudo-masek (runda {round_id}) z ckpt: {ckpt_path}")
     with torch.no_grad():

@@ -10,8 +10,6 @@ data:
 
   unlabeled_csv: data/metadata/train_unlabeled.csv
 
-  pseudo_labels_root: data/pseudo_labels/
-
   image_key: image_path
   mask_key: mask_path
   image_size: 256

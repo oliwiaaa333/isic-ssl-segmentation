@@ -50,8 +50,9 @@ def evaluate_logits_full(model, loader, device, metric_fns, thr, eps):
 
 
 def train_noisy_student(cfg, experiment_dir,
-                        pseudo_csv_name: str = "pseudo_labels_filtered.csv",
-                        init_checkpoint: str | None = None, tag: str = "r1"):
+                        pseudo_csv_path: str,
+                        init_checkpoint: str | None = None,
+                        tag: str = "r1"):
 
     device = torch.device(
         cfg["training"]["device"] if torch.cuda.is_available() else "cpu"
@@ -65,8 +66,7 @@ def train_noisy_student(cfg, experiment_dir,
     labeled_csv = cfg["data"]["supervised_train_csv"]
     val_csv     = cfg["data"]["supervised_val_csv"]
 
-    pseudo_root = Path(cfg["data"]["pseudo_labels_root"])
-    pseudo_csv = pseudo_root / pseudo_csv_name
+    pseudo_csv = Path(pseudo_csv_path).resolve()
 
     batch_size  = cfg["training"]["batch_size"]
     num_workers = cfg["data"]["num_workers"]
