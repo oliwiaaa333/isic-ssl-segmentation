@@ -33,12 +33,12 @@ training:
   device: cuda
   batch_size: 4   # 8, dla testu 4
 
-  pretrain_epochs: 3     # dla testu mniej epok
-  round1_epochs: 3       # dla testu mniej epok
-  round2_epochs: 3       # dla testu mniej epok
+  pretrain_epochs: 8
+  round1_epochs: 10
+  round2_epochs: 16
 
   mixed_precision: false
-  early_stopping_patience: 15
+  early_stopping_patience: 7
 
 loss:
   type: dice_bce_logits
@@ -71,8 +71,8 @@ logging:
   save_debug_predictions: true
 
 sus:
-  dropout_iterations: 2                # K = 4    dla testu zmieniam na 2
-  uncertainty_split_ratio: 0.5
+  dropout_iterations: 4
+  uncertainty_split_ratio: 0.4
   softmax_threshold: 0.9
   min_pixels_above_threshold: 0.2
   du1_csv: data/pseudo_labels/duumm_split_u1.csv
@@ -83,6 +83,6 @@ pum:
   ema_teacher2: 0.99                   # β
   fuse: mean
   supervised_weight: 1.0
-  unsupervised_weight: 1.0
+  unsupervised_weight: 0.8
   kl_scaling: true
   kl_temperature: 1.0

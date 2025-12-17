@@ -28,6 +28,7 @@ semi_supervised:
   min_conf: 0.3    # 0.55 dalo 37/500 zdjec    0.35 dalo 114 zdjec 0.3 144
   use_confidence_filter: true
   student_dropout: 0.5
+  rounds: 2
 
 model:
   type: maau
@@ -42,9 +43,10 @@ model:
 training:
   device: cuda
   batch_size: 8
-  epochs_student: 5      # z 50 na 5 dla testu
+  epochs_student: 12
+  epochs_student_star: 6
   mixed_precision: false
-  early_stopping_patience: 3   # z 10 na 3 dla testu
+  early_stopping_patience: 3
 
 loss:
   type: dice_bce_logits
@@ -58,7 +60,8 @@ optimizer:
 
 scheduler:
   type: cosine_annealing
-  t_max: 100
+  t_max: 24
+  t_max_star: 12
   min_lr: 1.0e-6
 
 metrics:
