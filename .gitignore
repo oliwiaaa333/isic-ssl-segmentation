@@ -5,15 +5,9 @@ __pycache__/
 .DS_Store
 
 data/raw/
-data/interim/
 data/processed/
-data/processed_test_hair_removal
-data/pseudo_labels/masks
-data/pseudo_labels/masks_r2
-/models/
-!src/models/
+data/processed_samples_hair_removal
 experiments/
-reports/figs/
-reports/metrics/
+reports/figs_preprocessing/
 wandb/
 mlruns/
