@@ -4,8 +4,8 @@ from pathlib import Path
 from datetime import datetime
 import shutil
 
-from src.semi_supervised.generate_pseudo_labels import generate_pseudo_labels
-from src.semi_supervised.filter_pseudo_labels import filter_pseudo_labels
+from src.semi_supervised.noisy_student.generate_pseudo_labels import generate_pseudo_labels
+from src.semi_supervised.noisy_student.filter_pseudo_labels import filter_pseudo_labels
 from src.training.train_noisy_student import train_noisy_student
 
 
