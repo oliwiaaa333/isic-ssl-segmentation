@@ -18,10 +18,6 @@ model:
   type: maau
   in_channels: 3
   out_channels: 1
-  encoder_filters: [64, 128, 256, 512]
-  decoder_filters: [512, 256, 128, 64]
-  use_attention_gates: true
-  use_antialiasing_pool: true
   final_activation: null
 
 augmentations:
