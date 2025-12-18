@@ -98,10 +98,11 @@ def train_epoch_dumm(
         tau_p,
         unsup_weight,
         sus_mask_set,
+        cfg,
 ):
     student.train()
 
-    sup_loss_fn = combined_loss_logits()
+    sup_loss_fn = combined_loss_logits(alpha=cfg["loss"]["dice_weight"], beta=cfg["loss"]["bce_weight"])
     t0 = time.time()
 
     total_loss = 0.0
@@ -150,8 +151,8 @@ def train_epoch_dumm(
         loss.backward()
         optimizer.step()
 
-        ema_update(teacher1, student, decay=0.999)
-        ema_update(teacher2, student, decay=0.99)
+        ema_update(teacher1, student, decay=cfg["pum"]["ema_teacher1"])
+        ema_update(teacher2, student, decay=cfg["pum"]["ema_teacher2"])
 
         total_loss += float(loss.item())
         total_sup += float(loss_sup.item())
@@ -217,8 +218,8 @@ def train_dumm(cfg, experiment_dir):
     # PHASE 1: PRETRAIN
     print("\n[PHASE 1] Pretraining student…")
 
-    sup_loss_fn = combined_loss_logits()
-    opt_pre = torch.optim.Adam(student.parameters(), lr=0.001)
+    sup_loss_fn = combined_loss_logits(alpha=cfg["loss"]["dice_weight"], beta=cfg["loss"]["bce_weight"])
+    opt_pre = torch.optim.Adam(student.parameters(), lr=cfg["optimizer"]["lr"], weight_decay=cfg["optimizer"]["weight_decay"])
 
     es_patience = cfg["training"]["early_stopping_patience"]
     best_val = -1.0
@@ -292,7 +293,7 @@ def train_dumm(cfg, experiment_dir):
     # PHASE 3: ROUND 1
     print("\n[PHASE 3] Training on D_u1…")
 
-    opt = torch.optim.Adam(student.parameters(), lr=cfg["optimizer"]["lr"])
+    opt = torch.optim.Adam(student.parameters(), lr=cfg["optimizer"]["lr"], weight_decay=cfg["optimizer"]["weight_decay"])
 
     sus_set = set(D_u1)
     best_val = -1.0
@@ -309,7 +310,8 @@ def train_dumm(cfg, experiment_dir):
             device,
             tau_p=cfg["pum"]["kl_temperature"],
             unsup_weight=cfg["pum"]["unsupervised_weight"],
-            sus_mask_set=sus_set
+            sus_mask_set=sus_set,
+            cfg=cfg
         )
 
         val_metrics = evaluate_logits_full(
@@ -360,7 +362,8 @@ def train_dumm(cfg, experiment_dir):
             device,
             tau_p=cfg["pum"]["kl_temperature"],
             unsup_weight=cfg["pum"]["unsupervised_weight"],
-            sus_mask_set=sus_set
+            sus_mask_set=sus_set,
+            cfg=cfg
         )
 
         val_metrics = evaluate_logits_full(

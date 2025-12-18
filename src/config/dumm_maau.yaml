@@ -31,7 +31,7 @@ augmentations:
 
 training:
   device: cuda
-  batch_size: 4   # 8, dla testu 4
+  batch_size: 4
 
   pretrain_epochs: 8
   round1_epochs: 10
@@ -46,13 +46,9 @@ loss:
   bce_weight: 0.5
 
 optimizer:
-  type: sgd
-  lr: 0.001
-  momentum: 0.9
-  weight_decay: 0.0001
-
-scheduler:
-  type: none
+  type: adam
+  lr: 1.0e-4
+  weight_decay: 0.0
 
 metrics:
   threshold: 0.5
@@ -64,23 +60,12 @@ metrics:
     - recall
     - specificity
 
-logging:
-  save_every_epochs: 5
-  best_model_metric: dice
-  results_dir: reports/metrics/duumm/
-  save_debug_predictions: true
-
 sus:
   dropout_iterations: 4
-  uncertainty_split_ratio: 0.4
   softmax_threshold: 0.9
-  min_pixels_above_threshold: 0.2
 
 pum:
   ema_teacher1: 0.999                  # α
   ema_teacher2: 0.99                   # β
-  fuse: mean
-  supervised_weight: 1.0
   unsupervised_weight: 0.8
-  kl_scaling: true
   kl_temperature: 1.0
