@@ -6,7 +6,7 @@ import cv2
 
 from src.models.maau import MAAU
 from src.training.data import make_loader_unlabeled
-from src.data.augmentations import get_augmentations_teacher
+from src.data.augmentations import get_augmentations
 
 
 def save_mask(mask_tensor, save_path):
@@ -21,9 +21,9 @@ def generate_pseudo_labels(cfg, experiment_dir: Path, checkpoint_path=None, roun
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     model = MAAU(
-        in_channels=3,
-        out_channels=1,
-        final_activation=None
+        in_channels=cfg["model"]["in_channels"],
+        out_channels=cfg["model"]["out_channels"],
+        final_activation=cfg["model"]["final_activation"],
     ).to(device)
 
     if checkpoint_path is None:
@@ -35,14 +35,14 @@ def generate_pseudo_labels(cfg, experiment_dir: Path, checkpoint_path=None, roun
     model.load_state_dict(ckpt["state_dict"])
     model.eval()
 
-    aug = get_augmentations_teacher()
+    aug = get_augmentations(cfg["augmentations"]["teacher"])
     unlabeled_csv = cfg["data"]["unlabeled_csv"]
 
     unl_dl = make_loader_unlabeled(
         unlabeled_csv,
         aug,
         batch_size=cfg["training"]["batch_size"],
-        num_workers=2
+        num_workers=cfg["data"]["num_workers"],
     )
 
     pseudo_root = Path(experiment_dir) / "pseudo_labels"

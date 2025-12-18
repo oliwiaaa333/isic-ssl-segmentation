@@ -78,7 +78,7 @@ def train_noisy_student(cfg, experiment_dir,
     model = MAAU(
         in_channels=cfg["model"]["in_channels"],
         out_channels=cfg["model"]["out_channels"],
-        final_activation=None,
+        final_activation=cfg["model"]["final_activation"],
     ).to(device)
 
     if init_checkpoint is None:
