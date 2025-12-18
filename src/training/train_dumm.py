@@ -276,17 +276,13 @@ def train_dumm(cfg, experiment_dir):
     # PHASE 2: SUS
     print("\n[PHASE 2] Running SUS prioritization…")
 
-    du_dir = Path(cfg["sus"]["du1_csv"]).parent
-    du_dir.mkdir(parents=True, exist_ok=True)
-
     D_u1, D_u2 = compute_sus_split(
         model=student,
         unlabeled_loader=unlabeled_dl_sus,
         device=device,
+        experiment_dir=Path(experiment_dir),
         K=cfg["sus"]["dropout_iterations"],
         rho=cfg["sus"]["softmax_threshold"],
-        save_csv=True,
-        out_dir=du_dir
     )
 
     student.load_state_dict(pretrained_state)

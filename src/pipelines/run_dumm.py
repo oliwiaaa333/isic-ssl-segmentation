@@ -19,6 +19,7 @@ def prepare_experiment_dir(cfg):
 
     (exp_dir / "checkpoints").mkdir(exist_ok=True)
     (exp_dir / "logs").mkdir(exist_ok=True)
+    (exp_dir / "splits").mkdir(exist_ok=True)
 
     shutil.copy(cfg["_config_path"], exp_dir / "config_used.yaml")
 

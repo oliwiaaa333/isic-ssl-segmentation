@@ -39,10 +39,9 @@ def compute_sus_split(
         model,
         unlabeled_loader,
         device,
+        experiment_dir: Path,
         K=5,
-        rho=0.9,
-        save_csv=False,
-        out_dir="data/dumm_split"
+        rho=0.9
 ):
 
     model = model.to(device)
@@ -108,14 +107,12 @@ def compute_sus_split(
     D_u1 = all_paths[idx_u1].tolist()
     D_u2 = all_paths[idx_u2].tolist()
 
-    # 4. Optional save to CSV
-    if save_csv:
-        out_dir = Path(out_dir)
-        out_dir.mkdir(parents=True, exist_ok=True)
 
-        pd.DataFrame({"image_path": D_u1}).to_csv(out_dir / "u1.csv", index=False)
-        pd.DataFrame({"image_path": D_u2}).to_csv(out_dir / "u2.csv", index=False)
+    splits_dir = experiment_dir / "splits"
+    splits_dir.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame({"image_path": D_u1}).to_csv(splits_dir / "u1.csv", index=False)
+    pd.DataFrame({"image_path": D_u2}).to_csv(splits_dir / "u2.csv", index=False)
 
-        print(f"[SUS] Saved split to {out_dir}/u1.csv and u2.csv")
+    print(f"[SUS] Saved split to {splits_dir}/u1.csv and u2.csv")
 
     return D_u1, D_u2
