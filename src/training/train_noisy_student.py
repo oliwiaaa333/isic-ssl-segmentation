@@ -19,7 +19,6 @@ from src.training.metrics import (
     precision_score,
     recall_score,
     specificity_score,
-    evaluate_logits,
 )
 
 
@@ -169,7 +168,7 @@ def train_noisy_student(cfg, experiment_dir,
             loss.backward()
             opt.step()
 
-            total_loss += loss.item()
+            total_loss += loss.item()   # suma batchy losses
 
         sched.step()
 

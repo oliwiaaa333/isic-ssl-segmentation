@@ -48,13 +48,3 @@ def specificity_score(pred, target, thr, eps):
     spec = (tn + eps) / (tn + fp + eps)
     return spec.mean().item()
 
-
-# zamiana logitow w sigmoid, potem wywolanie metryk
-def evaluate_logits(logits, target, metric_fns, thr, eps):
-    probs = torch.sigmoid(logits)
-
-    results = {}
-    for name, fn in metric_fns.items():
-        results[name] = fn(probs, target, thr=thr, eps=eps)
-
-    return results

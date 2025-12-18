@@ -2,7 +2,7 @@ from pathlib import Path
 import cv2
 import pandas as pd
 import torch
-from torch.utils.data import Dataset, DataLoader, random_split
+from torch.utils.data import Dataset, DataLoader
 
 
 # dla nadzorowanego i czesci labeled w noisy student i dumm

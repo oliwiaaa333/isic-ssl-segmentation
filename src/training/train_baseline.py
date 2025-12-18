@@ -1,6 +1,6 @@
 import csv, time
 from pathlib import Path
-import torch, torch.nn as nn
+import torch
 from torch.cuda.amp import autocast, GradScaler
 from src.models.maau import MAAU
 from src.training.metrics import dice_coeff, iou_score, precision_score, recall_score, specificity_score
