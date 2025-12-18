@@ -2,6 +2,8 @@ import torch
 import yaml
 from pathlib import Path
 import argparse
+import pandas as pd
+import json
 
 from src.models.maau import MAAU
 from src.training.data import make_loader_eval
@@ -12,7 +14,7 @@ from albumentations.pytorch import ToTensorV2
 
 
 @torch.no_grad()
-def evaluate_model(cfg_path, checkpoint_path):
+def evaluate_supervised(cfg_path: str, checkpoint_path: str):
 
     with open(cfg_path) as f:
         cfg = yaml.safe_load(f)
@@ -25,9 +27,7 @@ def evaluate_model(cfg_path, checkpoint_path):
         ToTensorV2()
     ])
 
-    test_csv = cfg["data"]["test_csv"]
-
-    test_dl = make_loader_eval(test_csv, test_tf, num_workers=cfg["data"]["num_workers"])
+    test_dl = make_loader_eval(cfg["data"]["test_csv"], test_tf, num_workers=cfg["data"]["num_workers"])
 
     model = MAAU(
         in_channels=cfg["model"]["in_channels"],
@@ -47,18 +47,37 @@ def evaluate_model(cfg_path, checkpoint_path):
     for x, y in test_dl:
         x, y = x.to(device), y.to(device)
         pred = model(x)
+
         dices.append(dice_coeff(pred, y, thr=thr, eps=eps))
         ious.append(iou_score(pred, y, thr=thr, eps=eps))
         precs.append(precision_score(pred, y, thr=thr, eps=eps))
         recs.append(recall_score(pred, y, thr=thr, eps=eps))
         specs.append(specificity_score(pred, y, thr=thr, eps=eps))
 
-    print("\n Metryki: ")
-    print("Dice:", sum(dices)/len(dices))
-    print("IoU:", sum(ious)/len(ious))
-    print("Precision:", sum(precs)/len(precs))
-    print("Recall:", sum(recs)/len(recs))
-    print("Specificity:", sum(specs)/len(specs))
+    metrics = {
+        "method": "supervised",
+        "dice": float(torch.stack(dices).mean()),
+        "iou": float(torch.stack(ious).mean()),
+        "precision": float(torch.stack(precs).mean()),
+        "recall": float(torch.stack(recs).mean()),
+        "specificity": float(torch.stack(specs).mean()),
+    }
+
+    exp_dir = Path(checkpoint_path).parents[1]
+    test_dir = exp_dir / "test"
+    test_dir.mkdir(exist_ok=True)
+
+    with open(test_dir / "metrics.json", "w") as f:
+        json.dump(metrics, f, indent=2)
+
+    pd.DataFrame([metrics]).to_csv(test_dir / "metrics.csv", index=False)
+
+    print("[INFO] Metryki dla supervised zapisane w: ", test_dir)
+    for k,v in metrics.items():
+        if k != "method":
+            print(f"{k}: {v:.4f}")
+
+
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
@@ -66,4 +85,4 @@ if __name__ == "__main__":
     p.add_argument("--checkpoint", required=True)
     args = p.parse_args()
 
-    evaluate_model(args.config, args.checkpoint)
+    evaluate_supervised(args.config, args.checkpoint)
