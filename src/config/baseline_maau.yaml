@@ -11,7 +11,7 @@ data:
   mask_key: mask_path
   image_size: 256
   num_workers: 4
-  augmentations: maau
+  augmentations: supervised
 
 model:
   type: maau
@@ -54,9 +54,3 @@ metrics:
   - precision
   - recall
   - specificity
-
-logging:
-  save_every_epochs: 5
-  best_model_metric: dice
-  results_dir: reports/metrics/maau_baseline/
-  save_debug_predictions: true

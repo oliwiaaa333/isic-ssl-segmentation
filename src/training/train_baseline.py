@@ -5,7 +5,7 @@ from torch.cuda.amp import autocast, GradScaler
 from src.models.maau import MAAU
 from src.training.metrics import dice_coeff, iou_score, precision_score, recall_score, specificity_score
 from src.training.data import make_loaders_supervised
-from src.data.augmentations import get_augmentations_supervised
+from src.data.augmentations import get_augmentations
 from src.training.losses import dice_loss, bce_loss, combined_loss
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
@@ -65,8 +65,9 @@ def train_one_epoch(model, loader, opt, scaler, loss_fn, device, use_amp=True):
 def fit(cfg, experiment_dir: Path):
     device = torch.device(cfg["training"]["device"])
 
-    train_tf = get_augmentations_supervised()
-    val_tf = A.Compose([A.Resize(256,256),A.Normalize(mean=(0.485,0.456,0.406), std=(0.229,0.224,0.225)), ToTensorV2()])
+    train_tf = get_augmentations(cfg["data"]["augmentations"])
+    size = cfg["data"]["image_size"]
+    val_tf = A.Compose([A.Resize(size, size), A.Normalize(mean=(0.485,0.456,0.406), std=(0.229,0.224,0.225)), ToTensorV2()])
 
     train_dl, val_dl = make_loaders_supervised(
         cfg["data"]["train_csv"],
