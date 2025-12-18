@@ -3,7 +3,6 @@ import yaml
 from pathlib import Path
 from datetime import datetime
 import shutil
-import csv
 
 from src.training.train_dumm import train_dumm
 
@@ -32,32 +31,7 @@ def train(cfg, experiment_dir):
     print("Config:", cfg["_config_path"])
     print(f"Wyniki i logi będą zapisane w: {experiment_dir}")
 
-    metrics_rows, best_model_path = train_dumm(cfg, experiment_dir)
-
-    # zapis CSV
-    csv_path = Path(experiment_dir) / "logs" / "metrics_dumm.csv"
-    with open(csv_path, "w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow([
-            "phase", "epoch",
-            "train_loss", "sup_loss", "unsup_loss",
-            "dice", "iou", "precision", "recall", "specificity",
-            "time_sec"
-        ])
-        for row in metrics_rows:
-            writer.writerow([
-                row["phase"],
-                row["epoch"],
-                row["loss"],
-                row["sup_loss"],
-                row["unsup_loss"],
-                row["dice"],
-                row["iou"],
-                row["precision"],
-                row["recall"],
-                row["specificity"],
-                row["time_sec"],
-            ])
+    _, best_model_path = train_dumm(cfg, experiment_dir)
 
     print(f"[INFO] Trening zakończony.")
     print(f"[INFO] Najlepszy model zapisany w {best_model_path}")

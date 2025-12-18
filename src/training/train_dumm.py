@@ -2,6 +2,7 @@ import time
 import copy
 from pathlib import Path
 import numpy as np
+import csv
 
 import torch
 from torch.utils.data import DataLoader
@@ -400,5 +401,34 @@ def train_dumm(cfg, experiment_dir):
     torch.save({"state_dict": student.state_dict()}, last_path)
 
     best_model_path = Path(experiment_dir) / "checkpoints" / "best_round2.pt"
+
+    logs_dir = Path(experiment_dir) / "logs"
+    logs_dir.mkdir(exist_ok=True)
+
+    csv_path = logs_dir / "metrics_dumm.csv"
+    with open(csv_path, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            "phase", "epoch",
+            "train_loss", "sup_loss", "unsup_loss",
+            "dice", "iou", "precision", "recall", "specificity",
+            "time_sec"
+        ])
+        for row in metrics_rows:
+            writer.writerow([
+                row["phase"],
+                row["epoch"],
+                row["loss"],
+                row["sup_loss"],
+                row["unsup_loss"],
+                row["dice"],
+                row["iou"],
+                row["precision"],
+                row["recall"],
+                row["specificity"],
+                row["time_sec"],
+            ])
+
+    print(f"[INFO] Zapisano metryki DUMM do {csv_path}")
 
     return metrics_rows, str(best_model_path)
