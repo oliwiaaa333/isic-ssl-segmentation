@@ -1,11 +1,10 @@
 import torch
-import torch.nn.functional as F
 import pandas as pd
 from pathlib import Path
-from torch.utils.data import DataLoader
 import numpy as np
 
 
+@torch.no_grad()
 def mc_dropout_predict(model, x, K=5):
 
     model.train()
