@@ -39,7 +39,6 @@ training:
   batch_size: 8
   epochs_student: 12
   epochs_student_star: 6
-  mixed_precision: false
   early_stopping_patience: 3
 
 loss:

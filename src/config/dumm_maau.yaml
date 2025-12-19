@@ -28,12 +28,9 @@ augmentations:
 training:
   device: cuda
   batch_size: 4
-
   pretrain_epochs: 8
   round1_epochs: 10
   round2_epochs: 16
-
-  mixed_precision: false
   early_stopping_patience: 7
 
 loss:
