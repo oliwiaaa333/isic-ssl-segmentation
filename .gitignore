@@ -3,11 +3,11 @@
 __pycache__/
 *.pyc
 .DS_Store
+.run
 
 data/raw/
 data/processed/
 data/processed_samples_hair_removal
-data/pseudo_labels
 experiments/
 reports/figs_preprocessing/
 wandb/
