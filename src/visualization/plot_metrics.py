@@ -47,8 +47,9 @@ def plot_metric(df, metric: str, out_dir: Path):
 
 def main(experiments_root: str, out_dir: str):
 
-    experiments_root = Path(experiments_root)
-    out_dir = Path(out_dir)
+    root = Path("/content/drive/MyDrive/isic-ssl-segmentation-project")
+    experiments_root = root / experiments_root
+    out_dir = root / out_dir
 
     df = collect_metrics(experiments_root)
 

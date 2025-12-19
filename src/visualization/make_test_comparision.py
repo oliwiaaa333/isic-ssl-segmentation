@@ -34,15 +34,17 @@ def make_test_comparison(
         samples_list=None,
         thr=0.5,
 ):
-    out_dir = Path(out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
 
     with open(cfg_path) as f:
         cfg = yaml.safe_load(f)
 
+    root = Path(cfg["paths"]["root"])
+    out_dir = root / out_dir
+    out_dir.mkdir(parents=True, exist_ok=True)
+
     device = torch.device(cfg["training"]["device"])
 
-    test_df = pd.read_csv(cfg["data"]["test_csv"]).reset_index(drop=True)
+    test_df = pd.read_csv(root / cfg["data"]["test_csv"]).reset_index(drop=True)
 
     test_tf = A.Compose([
         A.Resize(256, 256),
@@ -52,7 +54,7 @@ def make_test_comparison(
     ])
 
     test_dl = make_loader_eval(
-        cfg["data"]["test_csv"],
+        root / cfg["data"]["test_csv"],
         test_tf,
         num_workers=0,
         shuffle=False,

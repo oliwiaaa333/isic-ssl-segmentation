@@ -10,7 +10,8 @@ from src.training.train_noisy_student import train_noisy_student
 
 
 def prepare_experiment_dir(cfg):
-    experiment_root = Path(cfg["experiment"]["output_dir"])
+    root = Path(cfg["paths"]["root"])
+    experiment_root = root / cfg["experiment"]["output_dir"]
     experiment_root.mkdir(parents=True, exist_ok=True)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

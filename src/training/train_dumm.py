@@ -174,33 +174,36 @@ def train_dumm(cfg, experiment_dir):
         cfg["training"]["device"] if torch.cuda.is_available() else "cpu"
     )
 
+    root = Path(cfg["paths"]["root"])
+    experiment_dir = root / experiment_dir
+
     sup_tf = get_augmentations(cfg["augmentations"]["supervised"])
     student_tf = get_augmentations(cfg["augmentations"]["student_dumm"])
     teacher_tf = get_augmentations(cfg["augmentations"]["teacher_dumm"])
 
     labeled_dl = make_loader_labeled(
-        cfg["data"]["labeled_csv"],
+        root / cfg["data"]["labeled_csv"],
         student_tf,
         batch_size=cfg["training"]["batch_size"],
         num_workers=cfg["data"]["num_workers"]
     )
 
     unlabeled_dl_sus = make_loader_unlabeled(
-        cfg["data"]["unlabeled_csv"],
+        root / cfg["data"]["unlabeled_csv"],
         teacher_tf,
         batch_size=cfg["training"]["batch_size"],
         num_workers=cfg["data"]["num_workers"]
     )
 
     unlabeled_dl_train = make_loader_unlabeled(
-        cfg["data"]["unlabeled_csv"],
+        root / cfg["data"]["unlabeled_csv"],
         student_tf,
         batch_size=cfg["training"]["batch_size"],
         num_workers=cfg["data"]["num_workers"]
     )
 
     val_dl = make_loader_eval(
-        cfg["data"]["val_csv"],
+        root / cfg["data"]["val_csv"],
         sup_tf,
         num_workers=cfg["data"]["num_workers"]
     )
@@ -256,7 +259,7 @@ def train_dumm(cfg, experiment_dir):
             best_val = val_metrics["dice"]
             es_patience = cfg["training"]["early_stopping_patience"]
             torch.save({"state_dict": student.state_dict()},
-                       Path(experiment_dir) / "checkpoints" / "best_pretrain.pt")
+                       experiment_dir / "checkpoints" / "best_pretrain.pt")
         else:
             es_patience -= 1
             if es_patience == 0:
@@ -282,7 +285,7 @@ def train_dumm(cfg, experiment_dir):
         model=student,
         unlabeled_loader=unlabeled_dl_sus,
         device=device,
-        experiment_dir=Path(experiment_dir),
+        experiment_dir=experiment_dir,
         K=cfg["sus"]["dropout_iterations"],
         rho=cfg["sus"]["softmax_threshold"],
     )
@@ -338,7 +341,7 @@ def train_dumm(cfg, experiment_dir):
             best_val = val_metrics["dice"]
             es_patience = cfg["training"]["early_stopping_patience"]
             torch.save({"state_dict": student.state_dict()},
-                       Path(experiment_dir) / "checkpoints" / "best_round1.pt")
+                       experiment_dir / "checkpoints" / "best_round1.pt")
         else:
             es_patience -= 1
             if es_patience == 0:
@@ -389,7 +392,7 @@ def train_dumm(cfg, experiment_dir):
             best_val = val_metrics["dice"]
             es_patience = cfg["training"]["early_stopping_patience"]
             torch.save({"state_dict": student.state_dict()},
-                       Path(experiment_dir) / "checkpoints" / "best_round2.pt")
+                       experiment_dir / "checkpoints" / "best_round2.pt")
         else:
             es_patience -= 1
             if es_patience == 0:
@@ -397,12 +400,12 @@ def train_dumm(cfg, experiment_dir):
                 break
 
     # save last
-    last_path = Path(experiment_dir) / "checkpoints" / "last_model.pt"
+    last_path = experiment_dir / "checkpoints" / "last_model.pt"
     torch.save({"state_dict": student.state_dict()}, last_path)
 
-    best_model_path = Path(experiment_dir) / "checkpoints" / "best_round2.pt"
+    best_model_path = experiment_dir / "checkpoints" / "best_round2.pt"
 
-    logs_dir = Path(experiment_dir) / "logs"
+    logs_dir = experiment_dir / "logs"
     logs_dir.mkdir(exist_ok=True)
 
     csv_path = logs_dir / "metrics_dumm.csv"

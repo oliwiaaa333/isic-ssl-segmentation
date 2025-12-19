@@ -57,15 +57,17 @@ def train_noisy_student(cfg, experiment_dir,
         cfg["training"]["device"] if torch.cuda.is_available() else "cpu"
     )
 
+    root = Path(cfg["paths"]["root"])
+
     print("[INFO] Start treningu Noisy Student…")
 
     sup_tf     = get_augmentations(cfg["augmentations"]["supervised"])
     student_tf = get_augmentations(cfg["augmentations"]["student"])
 
-    labeled_csv = cfg["data"]["supervised_train_csv"]
-    val_csv     = cfg["data"]["supervised_val_csv"]
+    labeled_csv = root / cfg["data"]["supervised_train_csv"]
+    val_csv     = root / cfg["data"]["supervised_val_csv"]
 
-    pseudo_csv = Path(pseudo_csv_path).resolve()
+    pseudo_csv = root / pseudo_csv_path
 
     batch_size  = cfg["training"]["batch_size"]
     num_workers = cfg["data"]["num_workers"]
@@ -81,9 +83,9 @@ def train_noisy_student(cfg, experiment_dir,
     ).to(device)
 
     if init_checkpoint is None:
-        ckpt_path = cfg["semi_supervised"]["teacher_checkpoint"]
+        ckpt_path = root / cfg["semi_supervised"]["teacher_checkpoint"]
     else:
-        ckpt_path = init_checkpoint
+        ckpt_path = root / init_checkpoint
 
     teacher_ckpt = torch.load(ckpt_path, map_location=device)
     model.load_state_dict(teacher_ckpt["state_dict"])
@@ -121,7 +123,7 @@ def train_noisy_student(cfg, experiment_dir,
         "specificity": specificity_score,
     }
 
-    exp_dir = Path(experiment_dir)
+    exp_dir = root / Path(experiment_dir)
     ckpt_dir = exp_dir / "checkpoints"
     logs_dir = exp_dir / "logs"
 

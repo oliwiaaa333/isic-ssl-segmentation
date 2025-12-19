@@ -8,12 +8,13 @@ from src.training.train_dumm import train_dumm
 
 
 def prepare_experiment_dir(cfg):
-    root = Path(cfg["experiment"]["output_dir"])
-    root.mkdir(parents=True, exist_ok=True)
+    root = Path(cfg["paths"]["root"])
+    experiment_root = root / cfg["experiment"]["output_dir"]
+    experiment_root.mkdir(parents=True, exist_ok=True)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     name = f"{cfg['experiment']['name']}_seed{cfg['experiment']['seed']}_{timestamp}"
-    exp_dir = root / name
+    exp_dir = experiment_root / name
     exp_dir.mkdir(parents=True, exist_ok=True)
 
     (exp_dir / "checkpoints").mkdir(exist_ok=True)

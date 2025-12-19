@@ -3,6 +3,9 @@ experiment:
   seed: 0
   output_dir: experiments/
 
+paths:
+  root: /content/drive/MyDrive/isic-ssl-segmentation-project
+
 data:
   supervised_train_csv: data/metadata/train_labeled.csv
   supervised_val_csv: data/metadata/val.csv

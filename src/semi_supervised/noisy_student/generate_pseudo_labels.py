@@ -19,6 +19,7 @@ def save_mask(mask_tensor, save_path):
 
 def generate_pseudo_labels(cfg, experiment_dir: Path, checkpoint_path=None, round_id: int =1):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    root = Path(cfg["paths"]["root"])
 
     model = MAAU(
         in_channels=cfg["model"]["in_channels"],
@@ -27,16 +28,16 @@ def generate_pseudo_labels(cfg, experiment_dir: Path, checkpoint_path=None, roun
     ).to(device)
 
     if checkpoint_path is None:
-        ckpt_path = cfg["semi_supervised"]["teacher_checkpoint"]
+        ckpt_path = root / cfg["semi_supervised"]["teacher_checkpoint"]
     else:
-        ckpt_path = checkpoint_path
+        ckpt_path = root / checkpoint_path
 
     ckpt = torch.load(ckpt_path, map_location=device)
     model.load_state_dict(ckpt["state_dict"])
     model.eval()
 
     aug = get_augmentations(cfg["augmentations"]["teacher"])
-    unlabeled_csv = cfg["data"]["unlabeled_csv"]
+    unlabeled_csv = root / cfg["data"]["unlabeled_csv"]
 
     unl_dl = make_loader_unlabeled(
         unlabeled_csv,
@@ -45,7 +46,7 @@ def generate_pseudo_labels(cfg, experiment_dir: Path, checkpoint_path=None, roun
         num_workers=cfg["data"]["num_workers"],
     )
 
-    pseudo_root = Path(experiment_dir) / "pseudo_labels"
+    pseudo_root = root / experiment_dir / "pseudo_labels"
     masks_dir = pseudo_root / f"masks_r{round_id}"
     masks_dir.mkdir(parents=True, exist_ok=True)
 

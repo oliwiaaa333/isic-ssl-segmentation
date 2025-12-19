@@ -68,10 +68,11 @@ def fit(cfg, experiment_dir: Path):
     train_tf = get_augmentations(cfg["data"]["augmentations"])
     size = cfg["data"]["image_size"]
     val_tf = A.Compose([A.Resize(size, size), A.Normalize(mean=(0.485,0.456,0.406), std=(0.229,0.224,0.225)), ToTensorV2()])
+    root = Path(cfg["paths"]["root"])
 
     train_dl, val_dl = make_loaders_supervised(
-        cfg["data"]["train_csv"],
-        cfg["data"]["val_csv"],
+        root / cfg["data"]["train_csv"],
+        root / cfg["data"]["val_csv"],
         train_tf,
         val_tf,
         batch_size=cfg["training"]["batch_size"],
@@ -116,7 +117,7 @@ def fit(cfg, experiment_dir: Path):
     use_amp = cfg["training"]["mixed_precision"]
     scaler = GradScaler(enabled=use_amp)
 
-    logs_path = experiment_dir / "logs" / "metrics.csv"
+    logs_path = root / experiment_dir / "logs" / "metrics.csv"
     with open(logs_path, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([
@@ -129,7 +130,7 @@ def fit(cfg, experiment_dir: Path):
     best_dice = -1
     wait = 0
 
-    ckpt_dir = experiment_dir / "checkpoints"
+    ckpt_dir = root / experiment_dir / "checkpoints"
     best_path = ckpt_dir / "best_model.pt"
 
     for epoch in range(1, cfg["training"]["epochs"] + 1):

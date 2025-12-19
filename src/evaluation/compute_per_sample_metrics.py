@@ -19,13 +19,14 @@ def compute_per_sample_metrics(
         easy_q: float = 0.85,
         hard_q: float = 0.15,
 ):
-    out_dir = Path(out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
 
     with open(cfg_path) as f:
         cfg = yaml.safe_load(f)
-
+    root = Path(cfg["paths"]["root"])
     device = torch.device(cfg["training"]["device"])
+
+    out_dir = root / out_dir
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     test_tf = A.Compose([
         A.Resize(256, 256),
@@ -35,7 +36,7 @@ def compute_per_sample_metrics(
     ])
 
     test_dl = make_loader_eval(
-        cfg["data"]["test_csv"],
+        root / cfg["data"]["test_csv"],
         test_tf,
         num_workers=0,
         shuffle=False,
@@ -62,7 +63,7 @@ def compute_per_sample_metrics(
         d = dice_coeff(probs, y, thr=thr, eps=eps)
         dices.append(float(d))
 
-    df = pd.read_csv(cfg["data"]["test_csv"])
+    df = pd.read_csv(root / cfg["data"]["test_csv"])
     df = df.reset_index(drop=True)
     df["dice"] = dices
 

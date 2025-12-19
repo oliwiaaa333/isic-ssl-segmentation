@@ -1,7 +1,10 @@
 experiment:
-  name: dumm_maau
+  name: dumm
   seed: 0
   output_dir: experiments/
+
+paths:
+  root: /content/drive/MyDrive/isic-ssl-segmentation-project
 
 data:
   labeled_csv: data/metadata/train_labeled.csv

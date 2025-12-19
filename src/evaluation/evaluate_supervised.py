@@ -20,6 +20,7 @@ def evaluate_supervised(cfg_path: str, checkpoint_path: str):
         cfg = yaml.safe_load(f)
 
     device = torch.device(cfg["training"]["device"])
+    root = Path(cfg["paths"]["root"])
 
     test_tf = A.Compose([
         A.Resize(256, 256),
@@ -27,7 +28,7 @@ def evaluate_supervised(cfg_path: str, checkpoint_path: str):
         ToTensorV2()
     ])
 
-    test_dl = make_loader_eval(cfg["data"]["test_csv"], test_tf, num_workers=cfg["data"]["num_workers"])
+    test_dl = make_loader_eval(root / cfg["data"]["test_csv"], test_tf, num_workers=cfg["data"]["num_workers"])
 
     model = MAAU(
         in_channels=cfg["model"]["in_channels"],

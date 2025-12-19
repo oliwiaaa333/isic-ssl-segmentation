@@ -22,6 +22,7 @@ def evaluate_semi(cfg_path: str, checkpoint_path: str, method: str):
     with open(cfg_path) as f:
         cfg = yaml.safe_load(f)
 
+    root = Path(cfg["paths"]["root"])
     device = torch.device(cfg["training"]["device"])
 
     test_tf = A.Compose([
@@ -30,7 +31,7 @@ def evaluate_semi(cfg_path: str, checkpoint_path: str, method: str):
         ToTensorV2()
     ])
 
-    test_dl = make_loader_eval(cfg["data"]["test_csv"], test_tf, num_workers=cfg["data"]["num_workers"])
+    test_dl = make_loader_eval(root / cfg["data"]["test_csv"], test_tf, num_workers=cfg["data"]["num_workers"])
 
     model = MAAU(
         in_channels=cfg["model"]["in_channels"],

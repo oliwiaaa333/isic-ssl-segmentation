@@ -8,7 +8,8 @@ from src.training.train_baseline import fit
 
 
 def prepare_experiment_dir(cfg):
-    experiment_root = Path(cfg["experiment"]["output_dir"])
+    root = Path(cfg["paths"]["root"])
+    experiment_root = root / cfg["experiment"]["output_dir"]
     experiment_root.mkdir(parents=True, exist_ok=True)
 
     # pobieranie daty

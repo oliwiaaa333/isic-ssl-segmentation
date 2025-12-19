@@ -3,7 +3,8 @@ from pathlib import Path
 
 
 def filter_pseudo_labels(cfg, experiment_dir: Path, round_id: int=1):
-    pseudo_root = Path(experiment_dir) / "pseudo_labels"
+    root = Path(cfg["paths"]["root"])
+    pseudo_root = root / experiment_dir / "pseudo_labels"
     meta_path = pseudo_root / f"pseudo_labels_r{round_id}.csv"
     out_path = pseudo_root / f"pseudo_labels_r{round_id}_filtered.csv"
 

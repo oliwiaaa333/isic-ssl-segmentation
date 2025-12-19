@@ -1,7 +1,10 @@
 experiment:
-  name: maau_baseline
+  name: baseline
   seed: 0
   output_dir: experiments/
+
+paths:
+  root: /content/drive/MyDrive/isic-ssl-segmentation-project
 
 data:
   train_csv: data/metadata/train_labeled.csv
