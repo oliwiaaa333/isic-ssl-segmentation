@@ -57,11 +57,11 @@ def evaluate_supervised(cfg_path: str, checkpoint_path: str):
 
     metrics = {
         "method": "supervised",
-        "dice": float(torch.stack(dices).mean()),
-        "iou": float(torch.stack(ious).mean()),
-        "precision": float(torch.stack(precs).mean()),
-        "recall": float(torch.stack(recs).mean()),
-        "specificity": float(torch.stack(specs).mean()),
+        "dice": float(torch.tensor(dices).mean()),
+        "iou": float(torch.tensor(ious).mean()),
+        "precision": float(torch.tensor(precs).mean()),
+        "recall": float(torch.tensor(recs).mean()),
+        "specificity": float(torch.tensor(specs).mean()),
     }
 
     exp_dir = Path(checkpoint_path).parents[1]
